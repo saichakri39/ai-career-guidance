@@ -80,6 +80,84 @@ export interface ResumeParseResult {
   score: number;
 }
 
+export interface MlAnalyzeInput {
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  communicationScore: number;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  codingScore: number;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  aptitudeScore: number;
+}
+
+export interface DomainScore {
+  domain: string;
+  score: number;
+  rank: number;
+}
+
+export interface RegressionCoefficients {
+  intercept: number;
+  communication: number;
+  coding: number;
+  aptitude: number;
+}
+
+export interface LinearRegressionDetails {
+  equation: string;
+  coefficients: RegressionCoefficients;
+  rSquared: number;
+}
+
+export interface LogisticRegressionDetails {
+  equation: string;
+  weights: RegressionCoefficients;
+  decisionBoundary: number;
+}
+
+export interface SvmDetails {
+  kernelType: string;
+  supportVectors: number;
+  marginWidth: number;
+}
+
+export interface MlAnalyzeResult {
+  communicationScore: number;
+  codingScore: number;
+  aptitudeScore: number;
+  performancePrediction: number;
+  placementProbability: number;
+  placementEligibility: boolean;
+  recommendedDomain: string;
+  domainConfidence: number;
+  allDomainScores: DomainScore[];
+  linearRegressionDetails: LinearRegressionDetails;
+  logisticRegressionDetails: LogisticRegressionDetails;
+  svmDetails: SvmDetails;
+}
+
+export interface MlAnalysisRecord {
+  id: number;
+  userId: number;
+  communicationScore: number;
+  codingScore: number;
+  aptitudeScore: number;
+  performancePrediction: number;
+  placementProbability: number;
+  placementEligibility: boolean;
+  recommendedDomain: string;
+  domainConfidence: number;
+  createdAt: string;
+}
+
 export interface ScoreInput {
   resumeId: number;
   /** @nullable */

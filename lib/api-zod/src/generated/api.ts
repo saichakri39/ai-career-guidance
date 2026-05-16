@@ -139,6 +139,87 @@ export const ScoreResumeResponse = zod.object({
 
 
 /**
+ * @summary Run ML analysis on communication, coding, and aptitude scores
+ */
+export const mlAnalyzeBodyCommunicationScoreMin = 0;
+export const mlAnalyzeBodyCommunicationScoreMax = 100;
+
+export const mlAnalyzeBodyCodingScoreMin = 0;
+export const mlAnalyzeBodyCodingScoreMax = 100;
+
+export const mlAnalyzeBodyAptitudeScoreMin = 0;
+export const mlAnalyzeBodyAptitudeScoreMax = 100;
+
+
+
+export const MlAnalyzeBody = zod.object({
+  "communicationScore": zod.number().min(mlAnalyzeBodyCommunicationScoreMin).max(mlAnalyzeBodyCommunicationScoreMax),
+  "codingScore": zod.number().min(mlAnalyzeBodyCodingScoreMin).max(mlAnalyzeBodyCodingScoreMax),
+  "aptitudeScore": zod.number().min(mlAnalyzeBodyAptitudeScoreMin).max(mlAnalyzeBodyAptitudeScoreMax)
+})
+
+export const MlAnalyzeResponse = zod.object({
+  "communicationScore": zod.number(),
+  "codingScore": zod.number(),
+  "aptitudeScore": zod.number(),
+  "performancePrediction": zod.number(),
+  "placementProbability": zod.number(),
+  "placementEligibility": zod.boolean(),
+  "recommendedDomain": zod.string(),
+  "domainConfidence": zod.number(),
+  "allDomainScores": zod.array(zod.object({
+  "domain": zod.string(),
+  "score": zod.number(),
+  "rank": zod.number()
+})),
+  "linearRegressionDetails": zod.object({
+  "equation": zod.string(),
+  "coefficients": zod.object({
+  "intercept": zod.number(),
+  "communication": zod.number(),
+  "coding": zod.number(),
+  "aptitude": zod.number()
+}),
+  "rSquared": zod.number()
+}),
+  "logisticRegressionDetails": zod.object({
+  "equation": zod.string(),
+  "weights": zod.object({
+  "intercept": zod.number(),
+  "communication": zod.number(),
+  "coding": zod.number(),
+  "aptitude": zod.number()
+}),
+  "decisionBoundary": zod.number()
+}),
+  "svmDetails": zod.object({
+  "kernelType": zod.string(),
+  "supportVectors": zod.number(),
+  "marginWidth": zod.number()
+})
+})
+
+
+/**
+ * @summary Get ML analysis history
+ */
+export const GetMlHistoryResponseItem = zod.object({
+  "id": zod.number(),
+  "userId": zod.number(),
+  "communicationScore": zod.number(),
+  "codingScore": zod.number(),
+  "aptitudeScore": zod.number(),
+  "performancePrediction": zod.number(),
+  "placementProbability": zod.number(),
+  "placementEligibility": zod.boolean(),
+  "recommendedDomain": zod.string(),
+  "domainConfidence": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+export const GetMlHistoryResponse = zod.array(GetMlHistoryResponseItem)
+
+
+/**
  * @summary Get user prediction history
  */
 export const GetPredictionHistoryResponseItem = zod.object({

@@ -1,8 +1,17 @@
 import { Router } from "express";
-import { db, resumesTable, predictionsTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { db, resumesTable, predictionsTable, mlAnalysisTable } from "@workspace/db";
+import { eq, desc } from "drizzle-orm";
 import { requireAuth } from "../middlewares/auth";
-import { ScoreResumeBody } from "@workspace/api-zod";
+import { ScoreResumeBody, MlAnalyzeBody } from "@workspace/api-zod";
+import {
+  linearRegressionPredict,
+  logisticRegressionPredict,
+  svmPredict,
+  LINEAR_REGRESSION_COEFFICIENTS,
+  LINEAR_R_SQUARED,
+  LOGISTIC_REGRESSION_WEIGHTS,
+  LOGISTIC_DECISION_BOUNDARY,
+} from "../lib/ml";
 
 const router = Router();
 
@@ -121,6 +130,94 @@ router.post("/predictions/score", requireAuth, async (req, res) => {
     performancePrediction: prediction.performancePrediction,
     skillGaps: prediction.skillGaps,
   });
+});
+
+router.post("/predictions/ml-analyze", requireAuth, async (req, res) => {
+  const parsed = MlAnalyzeBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid input", details: parsed.error.issues });
+    return;
+  }
+
+  const { communicationScore, codingScore, aptitudeScore } = parsed.data;
+
+  // Linear Regression → predict performance score
+  const performancePrediction = linearRegressionPredict(communicationScore, codingScore, aptitudeScore);
+
+  // Logistic Regression → predict placement probability
+  const { probability: placementProbability, eligible: placementEligibility } =
+    logisticRegressionPredict(communicationScore, codingScore, aptitudeScore);
+
+  // SVM (one-vs-rest, linear kernel) → recommend career domain
+  const svmResult = svmPredict(communicationScore, codingScore, aptitudeScore) as ReturnType<typeof svmPredict> & { _marginWidth: number };
+  const { recommendedDomain, confidence: domainConfidence, allDomainScores, _marginWidth: marginWidth } = svmResult;
+
+  // Persist to DB
+  await db.insert(mlAnalysisTable).values({
+    userId: req.user!.id,
+    communicationScore,
+    codingScore,
+    aptitudeScore,
+    performancePrediction,
+    placementProbability,
+    placementEligibility,
+    recommendedDomain,
+    domainConfidence,
+    allDomainScores: JSON.stringify(allDomainScores),
+  });
+
+  const lrCoeffs = LINEAR_REGRESSION_COEFFICIENTS;
+
+  res.json({
+    communicationScore,
+    codingScore,
+    aptitudeScore,
+    performancePrediction,
+    placementProbability,
+    placementEligibility,
+    recommendedDomain,
+    domainConfidence,
+    allDomainScores,
+    linearRegressionDetails: {
+      equation: `performance = ${lrCoeffs.intercept} + ${lrCoeffs.communication}*comm + ${lrCoeffs.coding}*coding + ${lrCoeffs.aptitude}*aptitude`,
+      coefficients: lrCoeffs,
+      rSquared: LINEAR_R_SQUARED,
+    },
+    logisticRegressionDetails: {
+      equation: `P(placed) = σ(${LOGISTIC_REGRESSION_WEIGHTS.intercept} + ${LOGISTIC_REGRESSION_WEIGHTS.communication}*comm + ${LOGISTIC_REGRESSION_WEIGHTS.coding}*coding + ${LOGISTIC_REGRESSION_WEIGHTS.aptitude}*aptitude)`,
+      weights: LOGISTIC_REGRESSION_WEIGHTS,
+      decisionBoundary: LOGISTIC_DECISION_BOUNDARY,
+    },
+    svmDetails: {
+      kernelType: "Linear (one-vs-rest)",
+      supportVectors: 7,
+      marginWidth: marginWidth ?? 0,
+    },
+  });
+});
+
+router.get("/predictions/ml-history", requireAuth, async (req, res) => {
+  const records = await db
+    .select()
+    .from(mlAnalysisTable)
+    .where(eq(mlAnalysisTable.userId, req.user!.id))
+    .orderBy(desc(mlAnalysisTable.createdAt));
+
+  res.json(
+    records.map((r) => ({
+      id: r.id,
+      userId: r.userId,
+      communicationScore: r.communicationScore,
+      codingScore: r.codingScore,
+      aptitudeScore: r.aptitudeScore,
+      performancePrediction: r.performancePrediction,
+      placementProbability: r.placementProbability,
+      placementEligibility: r.placementEligibility,
+      recommendedDomain: r.recommendedDomain,
+      domainConfidence: r.domainConfidence,
+      createdAt: r.createdAt,
+    }))
+  );
 });
 
 router.get("/predictions/history", requireAuth, async (req, res) => {

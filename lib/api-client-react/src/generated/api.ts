@@ -25,6 +25,9 @@ import type {
   DashboardStats,
   HealthStatus,
   LoginInput,
+  MlAnalysisRecord,
+  MlAnalyzeInput,
+  MlAnalyzeResult,
   Prediction,
   PredictionResult,
   ProfileUpdate,
@@ -648,6 +651,154 @@ export const useScoreResume = <TError = ErrorType<unknown>,
       > => {
       return useMutation(getScoreResumeMutationOptions(options));
     }
+
+export const getMlAnalyzeUrl = () => {
+
+
+
+
+  return `/api/predictions/ml-analyze`
+}
+
+/**
+ * @summary Run ML analysis on communication, coding, and aptitude scores
+ */
+export const mlAnalyze = async (mlAnalyzeInput: MlAnalyzeInput, options?: RequestInit): Promise<MlAnalyzeResult> => {
+
+  return customFetch<MlAnalyzeResult>(getMlAnalyzeUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      mlAnalyzeInput,)
+  }
+);}
+
+
+
+
+export const getMlAnalyzeMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof mlAnalyze>>, TError,{data: BodyType<MlAnalyzeInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof mlAnalyze>>, TError,{data: BodyType<MlAnalyzeInput>}, TContext> => {
+
+const mutationKey = ['mlAnalyze'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof mlAnalyze>>, {data: BodyType<MlAnalyzeInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  mlAnalyze(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type MlAnalyzeMutationResult = NonNullable<Awaited<ReturnType<typeof mlAnalyze>>>
+    export type MlAnalyzeMutationBody = BodyType<MlAnalyzeInput>
+    export type MlAnalyzeMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Run ML analysis on communication, coding, and aptitude scores
+ */
+export const useMlAnalyze = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof mlAnalyze>>, TError,{data: BodyType<MlAnalyzeInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof mlAnalyze>>,
+        TError,
+        {data: BodyType<MlAnalyzeInput>},
+        TContext
+      > => {
+      return useMutation(getMlAnalyzeMutationOptions(options));
+    }
+
+export const getGetMlHistoryUrl = () => {
+
+
+
+
+  return `/api/predictions/ml-history`
+}
+
+/**
+ * @summary Get ML analysis history
+ */
+export const getMlHistory = async ( options?: RequestInit): Promise<MlAnalysisRecord[]> => {
+
+  return customFetch<MlAnalysisRecord[]>(getGetMlHistoryUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMlHistoryQueryKey = () => {
+    return [
+    `/api/predictions/ml-history`
+    ] as const;
+    }
+
+
+export const getGetMlHistoryQueryOptions = <TData = Awaited<ReturnType<typeof getMlHistory>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMlHistory>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMlHistoryQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMlHistory>>> = ({ signal }) => getMlHistory({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMlHistory>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetMlHistoryQueryResult = NonNullable<Awaited<ReturnType<typeof getMlHistory>>>
+export type GetMlHistoryQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get ML analysis history
+ */
+
+export function useGetMlHistory<TData = Awaited<ReturnType<typeof getMlHistory>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMlHistory>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetMlHistoryQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export const getGetPredictionHistoryUrl = () => {
 

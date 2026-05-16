@@ -1,0 +1,214 @@
+Build a complete full-stack AI-powered web application named “AI Career Guidance System” using React.js for frontend, Node.js + Express.js for backend, MongoDB for database, and Python ML models for predictions and recommendations.
+
+The website should be modern, responsive, professional, and portfolio-level with smooth animations, dashboards, charts, cards, gradients, and mobile-friendly design.
+
+Main Objective:
+The system should allow students to:
+
+* Create an account and login
+* Upload resumes (PDF/DOCX)
+* Enter academic and skill details
+* Analyze resume content using AI
+* Predict performance and placement eligibility
+* Recommend best career domains
+* Group students by skill level
+* Generate personalized AI career guidance and improvement suggestions
+
+Frontend Requirements (React.js):
+Create a professional UI with:
+
+* Landing page
+* Hero section
+* About section
+* Features section
+* Testimonials
+* Contact/Footer
+* Login & Signup pages
+* Student Dashboard
+* Resume Upload Page
+* Analytics Page
+* AI Suggestions Page
+* Profile Management
+
+UI Requirements:
+
+* Responsive design
+* Dark/light mode
+* Smooth scrolling
+* Animations and transitions
+* Modern cards and charts
+* Progress bars and statistics
+* Interactive dashboard
+* Clean professional theme
+
+Backend Requirements (Node.js + Express.js):
+Create REST APIs for:
+
+* Authentication (JWT)
+* Resume upload
+* Student profile management
+* ML prediction APIs
+* AI recommendation APIs
+* Dashboard analytics
+* History tracking
+
+Use middleware for:
+
+* Validation
+* Authentication
+* Error handling
+* File uploads
+
+Database (MongoDB):
+Store:
+
+* User accounts
+* Uploaded resumes
+* Prediction history
+* Student performance data
+* Career recommendations
+* AI-generated suggestions
+
+Resume Analysis Feature:
+When a student uploads a resume:
+
+* Extract resume text from PDF/DOCX
+* Analyze:
+
+  * Skills
+  * Technologies
+  * Education
+  * Projects
+  * Certifications
+  * Experience
+* Detect missing skills
+* Evaluate resume quality
+* Generate resume score
+
+Machine Learning Models:
+
+1. Linear Regression:
+   Predict student performance score based on:
+
+* Attendance
+* Coding Skills
+* Aptitude
+* Communication Skills
+
+Output:
+
+* Performance score out of 100
+
+2. Logistic Regression:
+   Predict placement eligibility:
+
+* Score >= 75 → Eligible
+* Score < 75 → Not Eligible
+
+3. Support Vector Machine (SVM):
+   Recommend best career domain:
+
+* AI/ML
+* Data Science
+* Web Development
+* Cybersecurity
+* Cloud Computing
+* UI/UX
+* Software Development
+
+4. K-Means Clustering:
+   Group students into:
+
+* Beginner
+* Intermediate
+* Advanced
+
+Use clustering based on:
+
+* Coding skills
+* Aptitude
+* Communication
+* Performance score
+
+Generative AI Features:
+After predictions and resume analysis, generate:
+
+* Personalized career guidance
+* Skill improvement suggestions
+* Recommended courses
+* Project ideas
+* Learning roadmap
+* Resume improvement tips
+* Interview preparation guidance
+* Career roadmap for selected domain
+
+Dashboard Features:
+Display:
+
+* Resume score
+* Performance score
+* Placement eligibility
+* Career domain recommendation
+* Skill cluster group
+* AI suggestions
+* Charts and analytics
+* Student growth tracking
+
+Visualization Features:
+
+* Bar charts
+* Pie charts
+* Line graphs
+* Progress indicators
+* Skill comparison graphs
+
+Tech Stack:
+Frontend:
+
+* React.js
+* Tailwind CSS or CSS
+
+Backend:
+
+* Node.js
+* Express.js
+
+Database:
+
+* MongoDB
+
+Machine Learning:
+
+* Python
+* Scikit-learn
+* Pandas
+* NumPy
+
+Resume Parsing:
+
+* PyPDF2 / pdf-parse
+* python-docx
+
+Charts:
+
+* Chart.js / Recharts
+
+Authentication:
+
+* JWT Authentication
+
+Project Requirements:
+
+* Clean folder structure
+* Reusable components
+* Modular architecture
+* API integration
+* Responsive design
+* Production-level UI
+* Proper comments in code
+* Error handling
+* Loading states
+* Validation
+
+Expected Final Output:
+Create a complete AI-driven career guidance platform that analyzes student resumes, predicts performance, checks placement eligibility, recommends career domains, groups students by skill level, and generates personalized AI guidance using machine learning and generative AI technologies.

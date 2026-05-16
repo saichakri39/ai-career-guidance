@@ -19,3 +19,22 @@ export const predictionsTable = pgTable("predictions", {
 export const insertPredictionSchema = createInsertSchema(predictionsTable).omit({ id: true, createdAt: true });
 export type InsertPrediction = z.infer<typeof insertPredictionSchema>;
 export type Prediction = typeof predictionsTable.$inferSelect;
+
+export const mlAnalysisTable = pgTable("ml_analysis", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  communicationScore: real("communication_score").notNull(),
+  codingScore: real("coding_score").notNull(),
+  aptitudeScore: real("aptitude_score").notNull(),
+  performancePrediction: real("performance_prediction").notNull(),
+  placementProbability: real("placement_probability").notNull(),
+  placementEligibility: boolean("placement_eligibility").notNull().default(false),
+  recommendedDomain: text("recommended_domain").notNull(),
+  domainConfidence: real("domain_confidence").notNull(),
+  allDomainScores: text("all_domain_scores").notNull().default("{}"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const insertMlAnalysisSchema = createInsertSchema(mlAnalysisTable).omit({ id: true, createdAt: true });
+export type InsertMlAnalysis = z.infer<typeof insertMlAnalysisSchema>;
+export type MlAnalysis = typeof mlAnalysisTable.$inferSelect;

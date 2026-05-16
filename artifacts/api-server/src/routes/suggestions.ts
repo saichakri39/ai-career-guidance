@@ -12,6 +12,19 @@ const openai = new OpenAI({
   apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
 });
 
+function extractJson(text: string): unknown {
+  const fenceMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const jsonText = fenceMatch ? fenceMatch[1] : text;
+  const start = jsonText.indexOf("{");
+  const end = jsonText.lastIndexOf("}");
+  if (start === -1 || end === -1) return {};
+  try {
+    return JSON.parse(jsonText.slice(start, end + 1));
+  } catch {
+    return {};
+  }
+}
+
 router.post("/suggestions/career", requireAuth, async (req, res) => {
   const parsed = GetCareerSuggestionsBody.safeParse(req.body);
   if (!parsed.success) {
@@ -42,31 +55,31 @@ Missing Skills: ${missingSkills.join(", ") || "None"}
 Resume Score: ${score}/100
 Target Role: ${target}
 
-Provide a JSON response with:
+Return a single JSON object (no markdown fences):
 {
   "careerGuidance": "2-3 paragraph personalized career guidance",
-  "skillImprovements": ["5 specific actionable skill improvement steps"],
+  "skillImprovements": ["step1", "step2", "step3", "step4", "step5"],
   "courses": [
-    {"title": "Course name", "provider": "Coursera/Udemy/etc", "url": "https://...", "level": "Beginner/Intermediate/Advanced"},
-    {"title": "...", "provider": "...", "url": "...", "level": "..."},
-    {"title": "...", "provider": "...", "url": "...", "level": "..."}
+    {"title": "Course name", "provider": "Platform", "url": "https://www.coursera.org", "level": "Beginner"},
+    {"title": "Course name", "provider": "Platform", "url": "https://www.udemy.com", "level": "Intermediate"},
+    {"title": "Course name", "provider": "Platform", "url": "https://www.edx.org", "level": "Advanced"}
   ],
-  "interviewTips": ["5 specific interview preparation tips"],
-  "resumeTips": ["5 specific resume improvement tips"]
-}
-
-Return ONLY the JSON, no extra text.`;
+  "interviewTips": ["tip1", "tip2", "tip3", "tip4", "tip5"],
+  "resumeTips": ["tip1", "tip2", "tip3", "tip4", "tip5"]
+}`;
 
   try {
     const completion = await openai.chat.completions.create({
       model: "gpt-5-mini",
-      messages: [{ role: "user", content: prompt }],
-      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: "You are a career counselor. Always respond with valid JSON only, no extra text." },
+        { role: "user", content: prompt },
+      ],
       max_tokens: 2000,
     });
 
     const content = completion.choices[0]?.message?.content ?? "{}";
-    const result = JSON.parse(content);
+    const result = extractJson(content) as Record<string, unknown>;
 
     await db.insert(suggestionsTable).values({
       userId: req.user!.id,
@@ -75,11 +88,11 @@ Return ONLY the JSON, no extra text.`;
     });
 
     res.json({
-      careerGuidance: result.careerGuidance ?? "Focus on building foundational skills and networking.",
-      skillImprovements: result.skillImprovements ?? [],
-      courses: result.courses ?? [],
-      interviewTips: result.interviewTips ?? [],
-      resumeTips: result.resumeTips ?? [],
+      careerGuidance: (result.careerGuidance as string) ?? "Focus on building foundational skills and networking actively in your target domain.",
+      skillImprovements: (result.skillImprovements as string[]) ?? [],
+      courses: (result.courses as Array<{ title: string; provider: string; url: string; level: string }>) ?? [],
+      interviewTips: (result.interviewTips as string[]) ?? [],
+      resumeTips: (result.resumeTips as string[]) ?? [],
     });
   } catch (err) {
     res.status(500).json({ error: "AI service unavailable", details: String(err) });
@@ -95,38 +108,52 @@ router.post("/suggestions/roadmap", requireAuth, async (req, res) => {
 
   const { skills, targetRole } = parsed.data;
 
-  const prompt = `You are an expert career counselor. Create a learning roadmap for:
+  const prompt = `You are a career counselor. Create a learning roadmap for:
 
 Current Skills: ${skills.join(", ") || "None"}
 Target Role: ${targetRole}
 
-Provide a JSON response with:
+Return a single JSON object (no markdown fences):
 {
   "targetRole": "${targetRole}",
-  "estimatedMonths": <number 3-18>,
+  "estimatedMonths": 6,
   "phases": [
     {
       "phase": 1,
-      "title": "Phase title",
-      "skills": ["skill1", "skill2", "skill3"],
-      "duration": "X weeks/months",
+      "title": "Foundation",
+      "skills": ["skill1", "skill2"],
+      "duration": "6 weeks",
       "resources": ["resource1", "resource2"]
+    },
+    {
+      "phase": 2,
+      "title": "Core Skills",
+      "skills": ["skill3", "skill4"],
+      "duration": "8 weeks",
+      "resources": ["resource1", "resource2"]
+    },
+    {
+      "phase": 3,
+      "title": "Advanced Topics",
+      "skills": ["skill5", "skill6"],
+      "duration": "6 weeks",
+      "resources": ["resource1"]
     }
   ]
-}
-
-Create 3-4 phases. Return ONLY the JSON.`;
+}`;
 
   try {
     const completion = await openai.chat.completions.create({
       model: "gpt-5-mini",
-      messages: [{ role: "user", content: prompt }],
-      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: "You are a career counselor. Always respond with valid JSON only, no extra text." },
+        { role: "user", content: prompt },
+      ],
       max_tokens: 1500,
     });
 
     const content = completion.choices[0]?.message?.content ?? "{}";
-    const result = JSON.parse(content);
+    const result = extractJson(content) as Record<string, unknown>;
 
     await db.insert(suggestionsTable).values({
       userId: req.user!.id,
@@ -135,9 +162,9 @@ Create 3-4 phases. Return ONLY the JSON.`;
     });
 
     res.json({
-      targetRole: result.targetRole ?? targetRole,
-      phases: result.phases ?? [],
-      estimatedMonths: result.estimatedMonths ?? 6,
+      targetRole: (result.targetRole as string) ?? targetRole,
+      phases: (result.phases as Array<{ phase: number; title: string; skills: string[]; duration: string; resources: string[] }>) ?? [],
+      estimatedMonths: (result.estimatedMonths as number) ?? 6,
     });
   } catch (err) {
     res.status(500).json({ error: "AI service unavailable", details: String(err) });
