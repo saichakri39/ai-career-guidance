@@ -75,11 +75,16 @@ Return a single JSON object (no markdown fences):
         { role: "system", content: "You are a career counselor. Always respond with valid JSON only, no extra text." },
         { role: "user", content: prompt },
       ],
-      max_tokens: 2000,
+      max_completion_tokens: 2000,
     });
 
     const content = completion.choices[0]?.message?.content ?? "{}";
-    const result = extractJson(content) as Record<string, unknown>;
+    let result: Record<string, unknown> = {};
+    try {
+      result = JSON.parse(content.trim()) as Record<string, unknown>;
+    } catch {
+      result = extractJson(content) as Record<string, unknown>;
+    }
 
     await db.insert(suggestionsTable).values({
       userId: req.user!.id,
@@ -108,52 +113,31 @@ router.post("/suggestions/roadmap", requireAuth, async (req, res) => {
 
   const { skills, targetRole } = parsed.data;
 
-  const prompt = `You are a career counselor. Create a learning roadmap for:
+  const prompt = `Create a 3-phase learning roadmap as a JSON object.
 
-Current Skills: ${skills.join(", ") || "None"}
-Target Role: ${targetRole}
+Student current skills: ${skills.join(", ") || "None listed"}
+Target role: ${targetRole}
 
-Return a single JSON object (no markdown fences):
-{
-  "targetRole": "${targetRole}",
-  "estimatedMonths": 6,
-  "phases": [
-    {
-      "phase": 1,
-      "title": "Foundation",
-      "skills": ["skill1", "skill2"],
-      "duration": "6 weeks",
-      "resources": ["resource1", "resource2"]
-    },
-    {
-      "phase": 2,
-      "title": "Core Skills",
-      "skills": ["skill3", "skill4"],
-      "duration": "8 weeks",
-      "resources": ["resource1", "resource2"]
-    },
-    {
-      "phase": 3,
-      "title": "Advanced Topics",
-      "skills": ["skill5", "skill6"],
-      "duration": "6 weeks",
-      "resources": ["resource1"]
-    }
-  ]
-}`;
+Respond with ONLY a JSON object in this exact shape, no markdown, no extra text:
+{"targetRole":"<role>","estimatedMonths":<number>,"phases":[{"phase":1,"title":"<title>","skills":["<skill>"],"duration":"<duration>","resources":["<resource>"]},{"phase":2,"title":"<title>","skills":["<skill>"],"duration":"<duration>","resources":["<resource>"]},{"phase":3,"title":"<title>","skills":["<skill>"],"duration":"<duration>","resources":["<resource>"]}]}`;
 
   try {
     const completion = await openai.chat.completions.create({
       model: "gpt-5-mini",
       messages: [
-        { role: "system", content: "You are a career counselor. Always respond with valid JSON only, no extra text." },
+        { role: "system", content: "You are a career counselor. Respond only with valid compact JSON, no markdown fences, no extra text." },
         { role: "user", content: prompt },
       ],
-      max_tokens: 1500,
+      max_completion_tokens: 2000,
     });
 
     const content = completion.choices[0]?.message?.content ?? "{}";
-    const result = extractJson(content) as Record<string, unknown>;
+    let result: Record<string, unknown> = {};
+    try {
+      result = JSON.parse(content.trim()) as Record<string, unknown>;
+    } catch {
+      result = extractJson(content) as Record<string, unknown>;
+    }
 
     await db.insert(suggestionsTable).values({
       userId: req.user!.id,
