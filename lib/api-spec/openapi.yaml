@@ -22,6 +22,8 @@ tags:
     description: Dashboard analytics
   - name: history
     description: User history
+  - name: bulk
+    description: Bulk CSV student analysis
 
 paths:
   /healthz:
@@ -93,6 +95,69 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
+
+  /bulk/upload:
+    post:
+      operationId: uploadBulkCsv
+      tags: [bulk]
+      summary: Upload a CSV of students and run ML analysis
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BulkCsvFileInput"
+      responses:
+        "200":
+          description: Analysis results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BulkUploadResponse"
+        "400":
+          description: Bad request
+
+  /bulk/history:
+    get:
+      operationId: getBulkHistory
+      tags: [bulk]
+      summary: Get bulk upload history
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of past uploads
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BulkUploadSummary"
+
+  /bulk/{id}:
+    get:
+      operationId: getBulkUpload
+      tags: [bulk]
+      summary: Get a specific bulk upload with full results
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Bulk upload results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BulkUploadResponse"
+        "404":
+          description: Not found
 
   /resume/upload:
     post:
@@ -900,3 +965,84 @@ components:
           type: number
         resumeId:
           type: integer
+
+    BulkCsvFileInput:
+      type: object
+      required: [file]
+      properties:
+        file:
+          type: string
+          format: binary
+
+    StudentAnalysisResult:
+      type: object
+      required: [name, communicationScore, codingScore, aptitudeScore, performancePrediction, placementProbability, placementEligibility, recommendedDomain, domainConfidence]
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        rollNumber:
+          type: string
+        department:
+          type: string
+        communicationScore:
+          type: number
+        codingScore:
+          type: number
+        aptitudeScore:
+          type: number
+        performancePrediction:
+          type: number
+        placementProbability:
+          type: number
+        placementEligibility:
+          type: boolean
+        recommendedDomain:
+          type: string
+        domainConfidence:
+          type: number
+
+    BulkUploadResponse:
+      type: object
+      required: [id, filename, studentCount, eligibleCount, notEligibleCount, eligibilityRate, results, createdAt]
+      properties:
+        id:
+          type: integer
+        filename:
+          type: string
+        studentCount:
+          type: integer
+        eligibleCount:
+          type: integer
+        notEligibleCount:
+          type: integer
+        eligibilityRate:
+          type: number
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudentAnalysisResult"
+        createdAt:
+          type: string
+          format: date-time
+
+    BulkUploadSummary:
+      type: object
+      required: [id, filename, studentCount, eligibleCount, notEligibleCount, eligibilityRate, createdAt]
+      properties:
+        id:
+          type: integer
+        filename:
+          type: string
+        studentCount:
+          type: integer
+        eligibleCount:
+          type: integer
+        notEligibleCount:
+          type: integer
+        eligibilityRate:
+          type: number
+        createdAt:
+          type: string
+          format: date-time

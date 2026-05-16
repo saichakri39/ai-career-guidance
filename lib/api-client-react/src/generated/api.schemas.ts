@@ -276,3 +276,43 @@ export interface ScoreHistoryPoint {
   resumeId: number;
 }
 
+export interface BulkCsvFileInput {
+  file: Blob;
+}
+
+export interface StudentAnalysisResult {
+  name: string;
+  email?: string;
+  rollNumber?: string;
+  department?: string;
+  communicationScore: number;
+  codingScore: number;
+  aptitudeScore: number;
+  performancePrediction: number;
+  placementProbability: number;
+  placementEligibility: boolean;
+  recommendedDomain: string;
+  domainConfidence: number;
+}
+
+export interface BulkUploadResponse {
+  id: number;
+  filename: string;
+  studentCount: number;
+  eligibleCount: number;
+  notEligibleCount: number;
+  eligibilityRate: number;
+  results: StudentAnalysisResult[];
+  createdAt: string;
+}
+
+export interface BulkUploadSummary {
+  id: number;
+  filename: string;
+  studentCount: number;
+  eligibleCount: number;
+  notEligibleCount: number;
+  eligibilityRate: number;
+  createdAt: string;
+}
+

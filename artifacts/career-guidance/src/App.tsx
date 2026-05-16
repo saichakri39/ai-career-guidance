@@ -12,6 +12,7 @@ import ResumePage from "@/pages/resume";
 import AnalyticsPage from "@/pages/analytics";
 import SuggestionsPage from "@/pages/suggestions";
 import ProfilePage from "@/pages/profile";
+import BulkPage from "@/pages/bulk";
 
 import { ProtectedRoute } from "@/components/protected-route";
 import { MainLayout } from "@/components/layout";
@@ -61,6 +62,14 @@ function Router() {
         <ProtectedRoute>
           <MainLayout>
             <ProfilePage />
+          </MainLayout>
+        </ProtectedRoute>
+      </Route>
+
+      <Route path="/bulk">
+        <ProtectedRoute>
+          <MainLayout>
+            <BulkPage />
           </MainLayout>
         </ProtectedRoute>
       </Route>

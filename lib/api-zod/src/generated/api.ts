@@ -61,6 +61,85 @@ export const GetMeResponse = zod.object({
 
 
 /**
+ * @summary Upload a CSV of students and run ML analysis
+ */
+export const UploadBulkCsvBody = zod.object({
+  "file": zod.instanceof(File)
+})
+
+export const UploadBulkCsvResponse = zod.object({
+  "id": zod.number(),
+  "filename": zod.string(),
+  "studentCount": zod.number(),
+  "eligibleCount": zod.number(),
+  "notEligibleCount": zod.number(),
+  "eligibilityRate": zod.number(),
+  "results": zod.array(zod.object({
+  "name": zod.string(),
+  "email": zod.string().optional(),
+  "rollNumber": zod.string().optional(),
+  "department": zod.string().optional(),
+  "communicationScore": zod.number(),
+  "codingScore": zod.number(),
+  "aptitudeScore": zod.number(),
+  "performancePrediction": zod.number(),
+  "placementProbability": zod.number(),
+  "placementEligibility": zod.boolean(),
+  "recommendedDomain": zod.string(),
+  "domainConfidence": zod.number()
+})),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Get bulk upload history
+ */
+export const GetBulkHistoryResponseItem = zod.object({
+  "id": zod.number(),
+  "filename": zod.string(),
+  "studentCount": zod.number(),
+  "eligibleCount": zod.number(),
+  "notEligibleCount": zod.number(),
+  "eligibilityRate": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+export const GetBulkHistoryResponse = zod.array(GetBulkHistoryResponseItem)
+
+
+/**
+ * @summary Get a specific bulk upload with full results
+ */
+export const GetBulkUploadParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetBulkUploadResponse = zod.object({
+  "id": zod.number(),
+  "filename": zod.string(),
+  "studentCount": zod.number(),
+  "eligibleCount": zod.number(),
+  "notEligibleCount": zod.number(),
+  "eligibilityRate": zod.number(),
+  "results": zod.array(zod.object({
+  "name": zod.string(),
+  "email": zod.string().optional(),
+  "rollNumber": zod.string().optional(),
+  "department": zod.string().optional(),
+  "communicationScore": zod.number(),
+  "codingScore": zod.number(),
+  "aptitudeScore": zod.number(),
+  "performancePrediction": zod.number(),
+  "placementProbability": zod.number(),
+  "placementEligibility": zod.boolean(),
+  "recommendedDomain": zod.string(),
+  "domainConfidence": zod.number()
+})),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
  * @summary Upload and parse a resume
  */
 export const UploadResumeBody = zod.object({

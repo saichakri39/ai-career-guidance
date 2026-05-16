@@ -5,6 +5,7 @@ import resumeRouter from "./resume";
 import predictionsRouter from "./predictions";
 import suggestionsRouter from "./suggestions";
 import dashboardRouter from "./dashboard";
+import bulkRouter from "./bulk";
 
 const router: IRouter = Router();
 
@@ -14,5 +15,6 @@ router.use(resumeRouter);
 router.use(predictionsRouter);
 router.use(suggestionsRouter);
 router.use(dashboardRouter);
+router.use(bulkRouter);
 
 export default router;

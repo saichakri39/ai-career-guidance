@@ -1,4 +1,4 @@
-import { pgTable, text, serial, timestamp, integer, real, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, integer, real, boolean, json } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -38,3 +38,17 @@ export const mlAnalysisTable = pgTable("ml_analysis", {
 export const insertMlAnalysisSchema = createInsertSchema(mlAnalysisTable).omit({ id: true, createdAt: true });
 export type InsertMlAnalysis = z.infer<typeof insertMlAnalysisSchema>;
 export type MlAnalysis = typeof mlAnalysisTable.$inferSelect;
+
+export const bulkUploadsTable = pgTable("bulk_uploads", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  filename: text("filename").notNull(),
+  studentCount: integer("student_count").notNull().default(0),
+  eligibleCount: integer("eligible_count").notNull().default(0),
+  results: text("results").notNull().default("[]"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const insertBulkUploadSchema = createInsertSchema(bulkUploadsTable).omit({ id: true, createdAt: true });
+export type InsertBulkUpload = z.infer<typeof insertBulkUploadSchema>;
+export type BulkUpload = typeof bulkUploadsTable.$inferSelect;

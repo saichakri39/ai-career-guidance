@@ -21,6 +21,9 @@ import type {
 
 import type {
   AuthResponse,
+  BulkCsvFileInput,
+  BulkUploadResponse,
+  BulkUploadSummary,
   CareerSuggestionResult,
   DashboardStats,
   HealthStatus,
@@ -342,6 +345,233 @@ export function useGetMe<TData = Awaited<ReturnType<typeof getMe>>, TError = Err
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetMeQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUploadBulkCsvUrl = () => {
+
+
+
+
+  return `/api/bulk/upload`
+}
+
+/**
+ * @summary Upload a CSV of students and run ML analysis
+ */
+export const uploadBulkCsv = async (bulkCsvFileInput: BulkCsvFileInput, options?: RequestInit): Promise<BulkUploadResponse> => {
+    const formData = new FormData();
+formData.append(`file`, bulkCsvFileInput.file);
+
+  return customFetch<BulkUploadResponse>(getUploadBulkCsvUrl(),
+  {
+    ...options,
+    method: 'POST'
+    ,
+    body:
+      formData,
+  }
+);}
+
+
+
+
+export const getUploadBulkCsvMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadBulkCsv>>, TError,{data: BodyType<BulkCsvFileInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof uploadBulkCsv>>, TError,{data: BodyType<BulkCsvFileInput>}, TContext> => {
+
+const mutationKey = ['uploadBulkCsv'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof uploadBulkCsv>>, {data: BodyType<BulkCsvFileInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  uploadBulkCsv(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UploadBulkCsvMutationResult = NonNullable<Awaited<ReturnType<typeof uploadBulkCsv>>>
+    export type UploadBulkCsvMutationBody = BodyType<BulkCsvFileInput>
+    export type UploadBulkCsvMutationError = ErrorType<void>
+
+    /**
+ * @summary Upload a CSV of students and run ML analysis
+ */
+export const useUploadBulkCsv = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadBulkCsv>>, TError,{data: BodyType<BulkCsvFileInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof uploadBulkCsv>>,
+        TError,
+        {data: BodyType<BulkCsvFileInput>},
+        TContext
+      > => {
+      return useMutation(getUploadBulkCsvMutationOptions(options));
+    }
+
+export const getGetBulkHistoryUrl = () => {
+
+
+
+
+  return `/api/bulk/history`
+}
+
+/**
+ * @summary Get bulk upload history
+ */
+export const getBulkHistory = async ( options?: RequestInit): Promise<BulkUploadSummary[]> => {
+
+  return customFetch<BulkUploadSummary[]>(getGetBulkHistoryUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetBulkHistoryQueryKey = () => {
+    return [
+    `/api/bulk/history`
+    ] as const;
+    }
+
+
+export const getGetBulkHistoryQueryOptions = <TData = Awaited<ReturnType<typeof getBulkHistory>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getBulkHistory>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetBulkHistoryQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBulkHistory>>> = ({ signal }) => getBulkHistory({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBulkHistory>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetBulkHistoryQueryResult = NonNullable<Awaited<ReturnType<typeof getBulkHistory>>>
+export type GetBulkHistoryQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get bulk upload history
+ */
+
+export function useGetBulkHistory<TData = Awaited<ReturnType<typeof getBulkHistory>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getBulkHistory>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetBulkHistoryQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetBulkUploadUrl = (id: number,) => {
+
+
+
+
+  return `/api/bulk/${id}`
+}
+
+/**
+ * @summary Get a specific bulk upload with full results
+ */
+export const getBulkUpload = async (id: number, options?: RequestInit): Promise<BulkUploadResponse> => {
+
+  return customFetch<BulkUploadResponse>(getGetBulkUploadUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetBulkUploadQueryKey = (id: number,) => {
+    return [
+    `/api/bulk/${id}`
+    ] as const;
+    }
+
+
+export const getGetBulkUploadQueryOptions = <TData = Awaited<ReturnType<typeof getBulkUpload>>, TError = ErrorType<void>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getBulkUpload>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetBulkUploadQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBulkUpload>>> = ({ signal }) => getBulkUpload(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBulkUpload>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetBulkUploadQueryResult = NonNullable<Awaited<ReturnType<typeof getBulkUpload>>>
+export type GetBulkUploadQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get a specific bulk upload with full results
+ */
+
+export function useGetBulkUpload<TData = Awaited<ReturnType<typeof getBulkUpload>>, TError = ErrorType<void>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getBulkUpload>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetBulkUploadQueryOptions(id,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

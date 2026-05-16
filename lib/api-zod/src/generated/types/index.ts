@@ -8,6 +8,9 @@
 
 export * from './activityItem';
 export * from './authResponse';
+export * from './bulkCsvFileInput';
+export * from './bulkUploadResponse';
+export * from './bulkUploadSummary';
 export * from './careerSuggestionResult';
 export * from './course';
 export * from './dashboardStats';
@@ -34,6 +37,7 @@ export * from './roadmapResult';
 export * from './scoreHistoryPoint';
 export * from './scoreInput';
 export * from './skillTrend';
+export * from './studentAnalysisResult';
 export * from './suggestion';
 export * from './suggestionInput';
 export * from './svmDetails';

@@ -9,6 +9,7 @@ import {
   User,
   LogOut,
   Menu,
+  Users,
 } from "lucide-react";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -28,6 +29,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
     { name: "Resumes", href: "/resume", icon: FileText },
     { name: "Analytics", href: "/analytics", icon: LineChart },
     { name: "Suggestions", href: "/suggestions", icon: Lightbulb },
+    { name: "Bulk Analysis", href: "/bulk", icon: Users },
     { name: "Profile", href: "/profile", icon: User },
   ];
 
