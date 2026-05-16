@@ -3,20 +3,32 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: AI Career Guidance System API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: resume
+    description: Resume upload and parsing
+  - name: predictions
+    description: ML prediction operations
+  - name: suggestions
+    description: AI career suggestions
+  - name: dashboard
+    description: Dashboard analytics
+  - name: history
+    description: User history
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,8 +36,320 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterInput"
+      responses:
+        "201":
+          description: Registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Bad request
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Unauthorized
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /resume/upload:
+    post:
+      operationId: uploadResume
+      tags: [resume]
+      summary: Upload and parse a resume
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ResumeFileInput"
+      responses:
+        "200":
+          description: Parsed resume data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResumeParseResult"
+
+  /resume/list:
+    get:
+      operationId: listResumes
+      tags: [resume]
+      summary: List user resumes
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of resumes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Resume"
+
+  /resume/{id}:
+    get:
+      operationId: getResume
+      tags: [resume]
+      summary: Get a resume by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Resume
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Resume"
+
+  /predictions/score:
+    post:
+      operationId: scoreResume
+      tags: [predictions]
+      summary: Generate resume score and predictions
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScoreInput"
+      responses:
+        "200":
+          description: Prediction results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PredictionResult"
+
+  /predictions/history:
+    get:
+      operationId: getPredictionHistory
+      tags: [predictions]
+      summary: Get user prediction history
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Prediction history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Prediction"
+
+  /suggestions/career:
+    post:
+      operationId: getCareerSuggestions
+      tags: [suggestions]
+      summary: Get AI career suggestions
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SuggestionInput"
+      responses:
+        "200":
+          description: AI career suggestions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CareerSuggestionResult"
+
+  /suggestions/roadmap:
+    post:
+      operationId: getLearningRoadmap
+      tags: [suggestions]
+      summary: Get AI learning roadmap
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoadmapInput"
+      responses:
+        "200":
+          description: Learning roadmap
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoadmapResult"
+
+  /suggestions/history:
+    get:
+      operationId: getSuggestionHistory
+      tags: [suggestions]
+      summary: Get AI suggestion history
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Suggestion history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Suggestion"
+
+  /dashboard/stats:
+    get:
+      operationId: getDashboardStats
+      tags: [dashboard]
+      summary: Get dashboard analytics summary
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /dashboard/skill-trends:
+    get:
+      operationId: getSkillTrends
+      tags: [dashboard]
+      summary: Get skill trend data for charts
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Skill trends
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SkillTrend"
+
+  /dashboard/score-history:
+    get:
+      operationId: getScoreHistory
+      tags: [dashboard]
+      summary: Get resume score history
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Score history over time
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ScoreHistoryPoint"
+
+  /profile:
+    get:
+      operationId: getProfile
+      tags: [auth]
+      summary: Get user profile
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+    patch:
+      operationId: updateProfile
+      tags: [auth]
+      summary: Update user profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileUpdate"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
+    ResumeFileInput:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+      required:
+        - file
+
     HealthStatus:
       type: object
       properties:
@@ -34,3 +358,374 @@ components:
       required:
         - status
 
+    RegisterInput:
+      type: object
+      required: [name, email, password]
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    AuthResponse:
+      type: object
+      required: [token, user]
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+
+    User:
+      type: object
+      required: [id, name, email, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    UserProfile:
+      type: object
+      required: [id, name, email, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        bio:
+          type: ["string", "null"]
+        targetRole:
+          type: ["string", "null"]
+        currentRole:
+          type: ["string", "null"]
+        skills:
+          type: array
+          items:
+            type: string
+        resumeCount:
+          type: integer
+        predictionCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+
+    ProfileUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        bio:
+          type: string
+        targetRole:
+          type: string
+        currentRole:
+          type: string
+
+    Resume:
+      type: object
+      required: [id, userId, filename, score, skills, createdAt]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        filename:
+          type: string
+        score:
+          type: ["number", "null"]
+        skills:
+          type: array
+          items:
+            type: string
+        missingSkills:
+          type: array
+          items:
+            type: string
+        rawText:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+
+    ResumeParseResult:
+      type: object
+      required: [resume, skills, missingSkills, score]
+      properties:
+        resume:
+          $ref: "#/components/schemas/Resume"
+        skills:
+          type: array
+          items:
+            type: string
+        missingSkills:
+          type: array
+          items:
+            type: string
+        score:
+          type: number
+
+    ScoreInput:
+      type: object
+      required: [resumeId]
+      properties:
+        resumeId:
+          type: integer
+        targetRole:
+          type: ["string", "null"]
+
+    PredictionResult:
+      type: object
+      required: [resumeScore, placementEligibility, careerDomain, clusterGroup]
+      properties:
+        resumeScore:
+          type: number
+        placementEligibility:
+          type: boolean
+        placementProbability:
+          type: number
+        careerDomain:
+          type: string
+        clusterGroup:
+          type: string
+        performancePrediction:
+          type: number
+        skillGaps:
+          type: array
+          items:
+            type: string
+
+    Prediction:
+      type: object
+      required: [id, userId, resumeId, resumeScore, placementEligibility, careerDomain, createdAt]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        resumeId:
+          type: integer
+        resumeScore:
+          type: number
+        placementEligibility:
+          type: boolean
+        placementProbability:
+          type: ["number", "null"]
+        careerDomain:
+          type: string
+        clusterGroup:
+          type: ["string", "null"]
+        performancePrediction:
+          type: ["number", "null"]
+        skillGaps:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    SuggestionInput:
+      type: object
+      required: [resumeId]
+      properties:
+        resumeId:
+          type: integer
+        targetRole:
+          type: ["string", "null"]
+
+    CareerSuggestionResult:
+      type: object
+      required: [careerGuidance, skillImprovements, courses, interviewTips, resumeTips]
+      properties:
+        careerGuidance:
+          type: string
+        skillImprovements:
+          type: array
+          items:
+            type: string
+        courses:
+          type: array
+          items:
+            $ref: "#/components/schemas/Course"
+        interviewTips:
+          type: array
+          items:
+            type: string
+        resumeTips:
+          type: array
+          items:
+            type: string
+
+    Course:
+      type: object
+      required: [title, provider, url, level]
+      properties:
+        title:
+          type: string
+        provider:
+          type: string
+        url:
+          type: string
+        level:
+          type: string
+
+    RoadmapInput:
+      type: object
+      required: [skills, targetRole]
+      properties:
+        skills:
+          type: array
+          items:
+            type: string
+        targetRole:
+          type: string
+
+    RoadmapResult:
+      type: object
+      required: [targetRole, phases, estimatedMonths]
+      properties:
+        targetRole:
+          type: string
+        phases:
+          type: array
+          items:
+            $ref: "#/components/schemas/RoadmapPhase"
+        estimatedMonths:
+          type: integer
+
+    RoadmapPhase:
+      type: object
+      required: [phase, title, skills, duration]
+      properties:
+        phase:
+          type: integer
+        title:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+        duration:
+          type: string
+        resources:
+          type: array
+          items:
+            type: string
+
+    Suggestion:
+      type: object
+      required: [id, userId, type, content, createdAt]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        type:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    DashboardStats:
+      type: object
+      required: [totalResumes, averageScore, bestScore, placementEligible, topSkills, careerDomains, recentActivity]
+      properties:
+        totalResumes:
+          type: integer
+        averageScore:
+          type: number
+        bestScore:
+          type: number
+        placementEligible:
+          type: boolean
+        placementProbability:
+          type: number
+        topSkills:
+          type: array
+          items:
+            type: string
+        missingSkills:
+          type: array
+          items:
+            type: string
+        careerDomains:
+          type: array
+          items:
+            $ref: "#/components/schemas/DomainStat"
+        recentActivity:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActivityItem"
+
+    DomainStat:
+      type: object
+      required: [domain, count, confidence]
+      properties:
+        domain:
+          type: string
+        count:
+          type: integer
+        confidence:
+          type: number
+
+    ActivityItem:
+      type: object
+      required: [id, type, description, createdAt]
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    SkillTrend:
+      type: object
+      required: [skill, count, category]
+      properties:
+        skill:
+          type: string
+        count:
+          type: integer
+        category:
+          type: string
+
+    ScoreHistoryPoint:
+      type: object
+      required: [date, score, resumeId]
+      properties:
+        date:
+          type: string
+          format: date-time
+        score:
+          type: number
+        resumeId:
+          type: integer

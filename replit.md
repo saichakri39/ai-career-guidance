@@ -1,44 +1,74 @@
-# [Project name]
+# AI Career Guidance System
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A full-stack AI-powered career intelligence platform that helps students and job-seekers get smart, data-driven guidance on their career paths.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/api-server run dev` — run the API server (port assigned by workflow)
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- Required env: `DATABASE_URL` — Postgres connection string (auto-provisioned)
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
+- Frontend: React + Vite + Tailwind CSS + Recharts + wouter + framer-motion
 - API: Express 5
 - DB: PostgreSQL + Drizzle ORM
 - Validation: Zod (`zod/v4`), `drizzle-zod`
+- Auth: JWT (jsonwebtoken + bcryptjs) — token stored in localStorage
+- AI: OpenAI via Replit AI Integrations (no API key required)
+- Resume Parsing: pdf-parse + mammoth
+- File Upload: multer (multipart/form-data)
 - API codegen: Orval (from OpenAPI spec)
 - Build: esbuild (CJS bundle)
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `lib/api-spec/openapi.yaml` — Single source of truth for all API contracts
+- `lib/db/src/schema/` — Drizzle ORM schema files (users, resumes, predictions, suggestions)
+- `artifacts/api-server/src/routes/` — Express route handlers
+- `artifacts/api-server/src/middlewares/auth.ts` — JWT auth middleware
+- `artifacts/career-guidance/src/` — React frontend (pages, components)
+- `lib/api-client-react/src/generated/` — Auto-generated React Query hooks
+- `lib/api-zod/src/generated/` — Auto-generated Zod schemas
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- OpenAPI-first contract: spec gates codegen, which gates the frontend. All type changes go through `openapi.yaml`.
+- JWT stored in localStorage; custom-fetch.ts automatically injects Authorization header.
+- ML predictions are implemented server-side in TypeScript (skill extraction, domain prediction, placement eligibility scoring) rather than a Python service — simpler deployment, same results.
+- AI features (career suggestions, roadmaps) use Replit AI Integrations (OpenAI) — no API key needed from users.
+- Resume parsing handles PDF (pdf-parse), DOCX (mammoth), and TXT files.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Landing page with hero, features, and CTA
+- JWT-based login/register
+- Resume upload with automatic skill extraction and scoring
+- ML-powered predictions: career domain, placement eligibility, cluster group
+- AI career suggestions powered by OpenAI: guidance, courses, interview tips, resume tips, learning roadmaps
+- Analytics dashboard with Recharts: score history, skill trends, career domain breakdown
+
+## Demo Account
+
+- Email: `demo@example.com`
+- Password: `Demo1234!`
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- No emojis in the UI
+- Dark/light mode support
+- Mobile responsive
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Run `pnpm --filter @workspace/api-spec run codegen` after every OpenAPI spec change
+- Run `pnpm --filter @workspace/db run push` after every schema change
+- JWT secret comes from `SESSION_SECRET` env var
+- OpenAI integration uses `AI_INTEGRATIONS_OPENAI_BASE_URL` and `AI_INTEGRATIONS_OPENAI_API_KEY` env vars (auto-provisioned by Replit)
 
 ## Pointers
 

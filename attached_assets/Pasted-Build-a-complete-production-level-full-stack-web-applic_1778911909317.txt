@@ -1,0 +1,110 @@
+Build a complete production-level full-stack web application named "AI Career Guidance System".
+
+Tech Stack:
+
+* Frontend: React.js + Tailwind CSS + Recharts
+* Backend: Node.js + Express.js
+* Database: MongoDB
+* Machine Learning: Python + Flask + Scikit-learn
+* Authentication: JWT
+* Resume Parsing: pdf-parse + mammoth/python-docx
+
+Project Requirements:
+
+* Modern responsive UI
+* Dark/light mode
+* Dashboard analytics
+* Professional animations
+* Clean modular architecture
+* Mobile responsive
+* Portfolio-quality design
+
+Frontend Pages:
+
+1. Landing Page
+2. Login/Register
+3. Dashboard
+4. Resume Upload
+5. Analytics
+6. AI Suggestions
+7. Profile Page
+
+Core Features:
+
+* JWT Authentication
+* Resume Upload and Parsing
+* Resume Score Generation
+* Skill Extraction
+* Missing Skill Detection
+* Student Analytics Dashboard
+* AI Career Recommendations
+* Placement Eligibility Prediction
+* Career Domain Recommendation
+* Student Skill Clustering
+
+ML Models:
+
+1. Linear Regression → Performance Prediction
+2. Logistic Regression → Placement Eligibility
+3. SVM → Career Domain Recommendation
+4. K-Means → Skill Group Clustering
+
+Generative AI Features:
+
+* Career Guidance
+* Skill Improvement Suggestions
+* Learning Roadmap
+* Recommended Courses
+* Resume Improvement Tips
+* Interview Preparation
+
+Backend APIs:
+
+* Auth APIs
+* Resume APIs
+* Prediction APIs
+* AI Suggestion APIs
+* Dashboard APIs
+* History APIs
+
+Database Collections:
+
+* Users
+* Resumes
+* Predictions
+* Suggestions
+* Analytics
+
+UI Requirements:
+
+* Cards
+* Charts
+* Progress bars
+* Interactive graphs
+* Animated dashboard
+* Gradient themes
+* Responsive sidebar/navbar
+
+Folder Structure:
+
+* frontend/
+* backend/
+* ml-service/
+
+Generate:
+
+* Complete frontend
+* Complete backend
+* MongoDB schema
+* Express routes
+* Controllers
+* Middleware
+* ML Python APIs
+* React components
+* Tailwind styling
+* Dashboard charts
+* API integration
+* Environment configuration
+* README instructions
+
+Use production-level clean code with reusable components and comments.
