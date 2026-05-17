@@ -7,16 +7,10 @@ import OpenAI from "openai";
 
 const router = Router();
 
-function getOpenAI(): OpenAI {
-  const apiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY ?? process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new Error("OpenAI API key not configured. Set OPENAI_API_KEY in your .env file.");
-  }
-  return new OpenAI({
-    baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-    apiKey,
-  });
-}
+const openai = new OpenAI({
+  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+});
 
 function extractJson(text: string): unknown {
   const fenceMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
@@ -75,7 +69,7 @@ Return a single JSON object (no markdown fences):
 }`;
 
   try {
-    const completion = await getOpenAI().chat.completions.create({
+    const completion = await openai.chat.completions.create({
       model: "gpt-5-mini",
       messages: [
         { role: "system", content: "You are a career counselor. Always respond with valid JSON only, no extra text." },
@@ -128,7 +122,7 @@ Respond with ONLY a JSON object in this exact shape, no markdown, no extra text:
 {"targetRole":"<role>","estimatedMonths":<number>,"phases":[{"phase":1,"title":"<title>","skills":["<skill>"],"duration":"<duration>","resources":["<resource>"]},{"phase":2,"title":"<title>","skills":["<skill>"],"duration":"<duration>","resources":["<resource>"]},{"phase":3,"title":"<title>","skills":["<skill>"],"duration":"<duration>","resources":["<resource>"]}]}`;
 
   try {
-    const completion = await getOpenAI().chat.completions.create({
+    const completion = await openai.chat.completions.create({
       model: "gpt-5-mini",
       messages: [
         { role: "system", content: "You are a career counselor. Respond only with valid compact JSON, no markdown fences, no extra text." },
