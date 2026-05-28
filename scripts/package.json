@@ -8,7 +8,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
+    "@esbuild/win32-x64": "^0.28.0",
     "@types/node": "catalog:",
+    "esbuild": "0.27.3",
     "tsx": "catalog:"
   }
 }

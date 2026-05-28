@@ -70,7 +70,7 @@ Return a single JSON object (no markdown fences):
 
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-5-mini",
+      model: "llama-3.1-8b-instant",
       messages: [
         { role: "system", content: "You are a career counselor. Always respond with valid JSON only, no extra text." },
         { role: "user", content: prompt },
@@ -123,7 +123,7 @@ Respond with ONLY a JSON object in this exact shape, no markdown, no extra text:
 
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-5-mini",
+      model: "llama-3.1-8b-instant",
       messages: [
         { role: "system", content: "You are a career counselor. Respond only with valid compact JSON, no markdown fences, no extra text." },
         { role: "user", content: prompt },
