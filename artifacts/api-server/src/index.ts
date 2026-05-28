@@ -20,7 +20,7 @@ async function runMigrations() {
       password_hash TEXT NOT NULL,
       bio TEXT,
       target_role TEXT,
-      current_role TEXT,
+     "current_role" TEXT,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
