@@ -4,6 +4,10 @@
     {
       "source": "/api/:path*",
       "destination": "https://ai-career-guidance-k9w9.onrender.com/api/:path*"
+    },
+    {
+      "source": "/((?!api).*)",
+      "destination": "/index.html"
     }
   ]
 }
