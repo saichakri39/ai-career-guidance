@@ -2,6 +2,7 @@ import { Router } from "express";
 import { db, resumesTable, suggestionsTable } from "@workspace/db";
 import { eq, desc } from "drizzle-orm";
 import { requireAuth } from "../middlewares/auth";
+
 import {
   GetCareerSuggestionsBody,
   GetLearningRoadmapBody,
@@ -16,10 +17,19 @@ const router = Router();
 ======================================================= */
 
 const openai = new OpenAI({
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY!,
+  baseURL: "https://api.groq.com/openai/v1",
 });
 
+console.log(
+  "KEY:",
+  process.env.AI_INTEGRATIONS_OPENAI_API_KEY
+);
+
+console.log(
+  "KEY LENGTH:",
+  process.env.AI_INTEGRATIONS_OPENAI_API_KEY?.length
+);
 /* =======================================================
    SAFE JSON PARSER
 ======================================================= */
@@ -71,8 +81,20 @@ router.post("/suggestions/career", requireAuth, async (req, res) => {
       });
     }
 
-    const skills = resume.skills || [];
-    const missingSkills = resume.missingSkills || [];
+    if (resume.userId !== req.user!.id) {
+      return res.status(403).json({
+        error: "Unauthorized",
+      });
+    }
+
+    const skills = Array.isArray(resume.skills)
+      ? resume.skills
+      : [];
+
+    const missingSkills = Array.isArray(resume.missingSkills)
+      ? resume.missingSkills
+      : [];
+
     const score = resume.score || 50;
 
     const prompt = `
@@ -125,7 +147,8 @@ ${targetRole}
       max_tokens: 1500,
     });
 
-    const content = completion.choices?.[0]?.message?.content || "{}";
+    const content =
+      completion.choices?.[0]?.message?.content || "{}";
 
     console.log("CAREER AI RESPONSE:", content);
 
@@ -137,12 +160,10 @@ ${targetRole}
       content: JSON.stringify(result),
     });
 
-    return res.json(result);
+    return res.status(200).json(result);
   } catch (error: any) {
     console.error("CAREER ERROR:");
     console.error(error);
-    console.error(error?.response?.data);
-    console.error(error?.message);
 
     return res.status(500).json({
       error: "Career suggestions failed",
@@ -167,8 +188,12 @@ router.post("/suggestions/roadmap", requireAuth, async (req, res) => {
 
     const { skills, targetRole } = parsed.data;
 
+    const safeSkills = Array.isArray(skills)
+      ? skills
+      : [];
+
     const prompt = `
-Create a learning roadmap.
+Create a complete learning roadmap.
 
 Return ONLY valid JSON.
 
@@ -187,7 +212,7 @@ Return ONLY valid JSON.
 }
 
 Current Skills:
-${skills.join(", ")}
+${safeSkills.join(", ")}
 
 Target Role:
 ${targetRole}
@@ -198,7 +223,8 @@ ${targetRole}
       messages: [
         {
           role: "system",
-          content: "Return valid JSON only.",
+          content:
+            "You are a roadmap generator. Return valid JSON only.",
         },
         {
           role: "user",
@@ -209,7 +235,8 @@ ${targetRole}
       max_tokens: 1500,
     });
 
-    const content = completion.choices?.[0]?.message?.content || "{}";
+    const content =
+      completion.choices?.[0]?.message?.content || "{}";
 
     console.log("ROADMAP AI RESPONSE:", content);
 
@@ -221,12 +248,10 @@ ${targetRole}
       content: JSON.stringify(result),
     });
 
-    return res.json(result);
+    return res.status(200).json(result);
   } catch (error: any) {
     console.error("ROADMAP ERROR:");
     console.error(error);
-    console.error(error?.response?.data);
-    console.error(error?.message);
 
     return res.status(500).json({
       error: "Roadmap generation failed",
@@ -247,7 +272,7 @@ router.get("/suggestions/history", requireAuth, async (req, res) => {
       .where(eq(suggestionsTable.userId, req.user!.id))
       .orderBy(desc(suggestionsTable.createdAt));
 
-    return res.json(suggestions);
+    return res.status(200).json(suggestions);
   } catch (error: any) {
     console.error("HISTORY ERROR:");
     console.error(error);
