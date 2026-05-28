@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: ai-career-guidance-backend
+    env: node
+    rootDir: artifacts/api-server
+    buildCommand: npm install -g pnpm && pnpm install --ignore-scripts && pnpm run build
+    startCommand: node --enable-source-maps ./dist/index.mjs
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+  - type: web
+    name: ai-career-guidance-frontend
+    env: static
+    rootDir: artifacts/career-guidance
+    buildCommand: npm install -g pnpm && pnpm install --ignore-scripts && pnpm run build
+    staticPublishPath: dist
