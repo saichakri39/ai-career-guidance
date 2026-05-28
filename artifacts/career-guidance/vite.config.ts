@@ -68,7 +68,7 @@ server: {
     },
     proxy: {
       "/api": {
-        target: "http://localhost:8080",
+   target: "https://ai-career-guidance-k9w9.onrender.com",
         changeOrigin: true,
       },
     },
